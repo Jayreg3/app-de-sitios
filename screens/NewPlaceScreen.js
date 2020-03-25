@@ -7,16 +7,33 @@ import {
   StyleSheet,
   TextInput
 } from "react-native";
+import { useDispatch } from "react-redux";
 import colors from "../constants/colors";
+import * as placesActions from "../store/places-actions";
+import ImagePicker from "../components/ImagePicker";
 
 const NewPlaceScreen = props => {
   const [titleValue, setTitleValue] = useState("");
+  const [selectedImage, setSelectedImage] = useState();
+  const dispatch = useDispatch();
 
-  const titleChangeHandler = text => {
-    setTitleValue(text);
+  const titleChangeHandler = event => {
+    console.log("titleChangeHandler...text =", event.nativeEvent.text);
+    setTitleValue(event.nativeEvent.text);
   };
 
-  const savePlaceHandler = () => {};
+  const imageTakenHandler = imagePath => {
+    setSelectedImage(imagePath);
+    console.log("imageTakenHandler... image =", imagePath);
+  };
+
+  const savePlaceHandler = () => {
+    console.log("savePlaceHandler...image state = ", selectedImage);
+    dispatch(placesActions.addPlace(titleValue, selectedImage));
+    console.log("[NewPlaceScreen]...savePlaceHandler firing");
+    console.log("[NewPlaceScreen]...titleValue = ", titleValue);
+    props.navigation.goBack();
+  };
 
   return (
     <ScrollView>
@@ -28,6 +45,7 @@ const NewPlaceScreen = props => {
           onChange={titleChangeHandler}
         />
       </View>
+      <ImagePicker onImageTaken={imageTakenHandler} />
       <Button
         title="Guardar sitio"
         color={colors.primary}
