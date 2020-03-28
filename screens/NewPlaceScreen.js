@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   ScrollView,
   View,
@@ -11,10 +11,13 @@ import { useDispatch } from "react-redux";
 import colors from "../constants/colors";
 import * as placesActions from "../store/places-actions";
 import ImagePicker from "../components/ImagePicker";
+import LocationPicker from "../components/LocationPicker";
 
 const NewPlaceScreen = props => {
   const [titleValue, setTitleValue] = useState("");
   const [selectedImage, setSelectedImage] = useState();
+  const [selectedLocation, setSelectedLocation] = useState();
+
   const dispatch = useDispatch();
 
   const titleChangeHandler = event => {
@@ -24,12 +27,19 @@ const NewPlaceScreen = props => {
 
   const imageTakenHandler = imagePath => {
     setSelectedImage(imagePath);
-    console.log("imageTakenHandler... image =", imagePath);
+    console.log("imageTakenHandler... image = ", imagePath);
   };
+
+  const locationPickedHandler = useCallback(location => {
+    console.log("locationPickedHandler...location = ", location);
+    setSelectedLocation(location);
+  }, []);
 
   const savePlaceHandler = () => {
     console.log("savePlaceHandler...image state = ", selectedImage);
-    dispatch(placesActions.addPlace(titleValue, selectedImage));
+    dispatch(
+      placesActions.addPlace(titleValue, selectedImage, selectedLocation)
+    );
     console.log("[NewPlaceScreen]...savePlaceHandler firing");
     console.log("[NewPlaceScreen]...titleValue = ", titleValue);
     props.navigation.goBack();
@@ -46,6 +56,10 @@ const NewPlaceScreen = props => {
         />
       </View>
       <ImagePicker onImageTaken={imageTakenHandler} />
+      <LocationPicker
+        navigation={props.navigation}
+        onLocationPicked={locationPickedHandler}
+      />
       <Button
         title="Guardar sitio"
         color={colors.primary}
